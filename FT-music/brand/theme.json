@@ -1,0 +1,25 @@
+{
+  "product": "FT-music",
+  "tagline": "Your music, openly connected",
+  "palette": {
+    "primary": "#7C3AED",
+    "primary_dark": "#5B21B6",
+    "accent": "#22D3EE",
+    "background": "#0B1020",
+    "surface": "#151B2E",
+    "surface_elevated": "#202943",
+    "text_primary": "#F8FAFC",
+    "text_secondary": "#A5B4CC",
+    "success": "#34D399",
+    "danger": "#FB7185"
+  },
+  "shape": {
+    "corner_radius_dp": 16,
+    "button_radius_dp": 12
+  },
+  "logo": {
+    "mark": "two overlapping sound-wave arcs forming an F",
+    "wordmark": "FT-music",
+    "clear_space": "one mark width"
+  }
+}
