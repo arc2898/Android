@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
+  <title id="title">FT-music charcoal pistachio mark</title>
+  <desc id="desc">An abstract FT monogram joined with a musical note.</desc>
+  <rect width="512" height="512" rx="120" fill="#0B0E0C"/>
+  <rect x="12" y="12" width="488" height="488" rx="108" fill="#111513" stroke="#BFE98D" stroke-opacity=".28" stroke-width="6"/>
+  <g fill="#BFE98D">
+    <rect x="122" y="150" width="188" height="34" rx="17"/>
+    <rect x="122" y="225" width="146" height="34" rx="17"/>
+    <rect x="122" y="300" width="120" height="34" rx="17"/>
+    <rect x="285" y="135" width="34" height="245" rx="17"/>
+    <rect x="285" y="135" width="124" height="34" rx="17"/>
+    <circle cx="382" cy="365" r="38"/>
+  </g>
+  <circle cx="382" cy="365" r="22" fill="#111513"/>
+</svg>
