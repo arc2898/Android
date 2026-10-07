@@ -33,12 +33,18 @@ Future<void> bootstrapApp() async {
   // DI wiring (registers singletons).
   await ServiceLocator.setup();
 
-  // Ensure hosted repositories are persisted in settings (idempotent).
-  // Missing URLs are added, existing ones are left untouched.
+  // Only reconcile hosted repositories during first-run bootstrap. The old
+  // behavior fetched this catalogue on every launch before the first frame.
   try {
-    await PluginBootstrapService.ensureHostedRepositoriesPresent(
-      repositoryService: ServiceLocator.pluginRepositoryService,
-    );
+    final settingsDao = SettingsDAO(DBProvider.db);
+    final bootstrapped = await settingsDao
+            .getSettingBool(SettingKeys.repositoriesBootstrapped) ??
+        false;
+    if (!bootstrapped) {
+      await PluginBootstrapService.ensureHostedRepositoriesPresent(
+        repositoryService: ServiceLocator.pluginRepositoryService,
+      );
+    }
   } catch (e) {
     log('Hosted repository reconciliation skipped',
         error: e, name: 'Bootstrap');

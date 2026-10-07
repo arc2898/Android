@@ -4,7 +4,6 @@ import 'package:ft_music/core/theme/app_theme.dart';
 import 'package:ft_music/screens/widgets/media_metadata_links.dart';
 import 'package:ft_music/utils/load_image.dart';
 import 'package:flutter/material.dart';
-import 'package:icons_plus/icons_plus.dart';
 
 class AlbumCard extends StatefulWidget {
   final AlbumSummary album;
@@ -95,7 +94,7 @@ class _AlbumCardState extends State<AlbumCard> {
                             color: Colors.black.withValues(alpha: 0.4),
                             child: const Center(
                               child: Icon(
-                                MingCute.play_circle_fill,
+                                Icons.play_circle_filled_rounded,
                                 color: Colors.white,
                                 size: 42,
                               ),

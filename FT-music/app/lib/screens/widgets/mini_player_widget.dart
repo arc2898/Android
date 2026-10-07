@@ -13,7 +13,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:icons_plus/icons_plus.dart';
 import 'package:responsive_framework/responsive_framework.dart';
 
 class MiniPlayerWidget extends StatelessWidget {
@@ -196,7 +195,7 @@ class _MiniPlayerCardState extends State<MiniPlayerCard>
                         ),
                         if (isDesktop)
                           _ControlButton(
-                            icon: FontAwesome.backward_step_solid,
+                            icon: Icons.skip_previous_rounded,
                             size: 20,
                             onPressed: () {
                               HapticFeedback.lightImpact();
@@ -209,7 +208,7 @@ class _MiniPlayerCardState extends State<MiniPlayerCard>
                         _PlayPauseButton(state: widget.state),
                         if (isDesktop)
                           _ControlButton(
-                            icon: FontAwesome.forward_step_solid,
+                            icon: Icons.skip_next_rounded,
                             size: 20,
                             onPressed: () {
                               HapticFeedback.lightImpact();
@@ -220,7 +219,7 @@ class _MiniPlayerCardState extends State<MiniPlayerCard>
                             },
                           ),
                         _ControlButton(
-                          icon: FontAwesome.plus_solid,
+                          icon: Icons.add_rounded,
                           size: 18,
                           onPressed: () {
                             HapticFeedback.lightImpact();
@@ -477,7 +476,7 @@ class _PlayPauseButton extends StatelessWidget {
 
     if (state.isCompleted) {
       return _ControlButton(
-        icon: FontAwesome.rotate_right_solid,
+        icon: Icons.replay_rounded,
         size: 22,
         onPressed: () {
           HapticFeedback.mediumImpact();
@@ -509,9 +508,7 @@ class _PlayPauseButton extends StatelessWidget {
             transitionBuilder: (child, anim) =>
                 ScaleTransition(scale: anim, child: child),
             child: Icon(
-              state.isPlaying
-                  ? FontAwesome.pause_solid
-                  : FontAwesome.play_solid,
+              state.isPlaying ? Icons.pause_rounded : Icons.play_arrow_rounded,
               key: ValueKey(state.isPlaying),
               size: 18,
               color: Colors.white,

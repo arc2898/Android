@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:ui' as ui;
 
 import 'package:ft_music/blocs/downloader/cubit/downloader_cubit.dart';
 import 'package:ft_music/blocs/library/cubit/library_items_cubit.dart';
@@ -17,14 +18,12 @@ import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ft_music/l10n/app_localizations.dart';
-import 'package:icons_plus/icons_plus.dart';
 import 'package:ft_music/services/player/player_engine.dart';
 import 'package:ft_music/screens/widgets/like_widget.dart';
 import 'package:ft_music/screens/widgets/play_pause_widget.dart';
 import 'package:ft_music/screens/widgets/snackbar.dart';
 import 'package:ft_music/core/theme/app_theme.dart';
 import 'package:ft_music/utils/load_image.dart';
-import 'package:ft_music/utils/pallete_generator.dart';
 import 'package:responsive_framework/responsive_framework.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../blocs/media_player/bloomee_player_cubit.dart';
@@ -71,7 +70,7 @@ class _AudioPlayerViewState extends State<AudioPlayerView>
     final isMobile = ResponsiveBreakpoints.of(context).smallerOrEqualTo(TABLET);
 
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 12, 4, 9),
+      backgroundColor: Default_Theme.themeColor,
       resizeToAvoidBottomInset: false,
       extendBodyBehindAppBar: true,
       appBar: AppBar(
@@ -101,13 +100,13 @@ class _AudioPlayerViewState extends State<AudioPlayerView>
                 );
               }
             },
-            icon: const Icon(MingCute.list_check_3_line,
+            icon: const Icon(Icons.queue_music_rounded,
                 size: 22, color: Default_Theme.primaryColor1),
           ),
           IconButton(
             onPressed: () =>
                 showMoreBottomSheet(context, musicPlayer.currentMedia),
-            icon: const Icon(MingCute.more_2_fill,
+            icon: const Icon(Icons.more_horiz_rounded,
                 size: 25, color: Default_Theme.primaryColor1),
           )
         ],
@@ -139,7 +138,7 @@ class _AudioPlayerViewState extends State<AudioPlayerView>
         ),
       ),
       body: AnimatedSwitcher(
-        duration: const Duration(seconds: 1),
+        duration: const Duration(milliseconds: 180),
         child: isMobile
             ? LayoutBuilder(
                 builder: (context, constraints) {
@@ -377,6 +376,7 @@ class _DownloadButton extends StatefulWidget {
 class _DownloadButtonState extends State<_DownloadButton> {
   String? _lastTrackId;
   bool _isDownloaded = false;
+  bool _isDownloading = false;
   StreamSubscription? _mediaSub;
 
   @override
@@ -416,16 +416,40 @@ class _DownloadButtonState extends State<_DownloadButton> {
 
   @override
   Widget build(BuildContext context) {
-    if (!_isDownloaded) return const SizedBox.shrink();
+    final player = context.read<BloomeePlayerCubit>().bloomeePlayer;
+    final currentMedia = player.mediaItem.valueOrNull;
+    if (currentMedia == null) return const SizedBox.shrink();
     return Tooltip(
-      message: AppLocalizations.of(context)!.tooltipAvailableOffline,
+      message: _isDownloaded ? 'Saved offline' : 'Download for offline',
       child: IconButton(
         iconSize: 25,
-        icon: Icon(
-          Icons.offline_pin_rounded,
-          color: Default_Theme.primaryColor1.withValues(alpha: 0.5),
-        ),
-        onPressed: () {},
+        icon: _isDownloading
+            ? const SizedBox(
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(strokeWidth: 2.2),
+              )
+            : Icon(
+                _isDownloaded
+                    ? Icons.offline_pin_rounded
+                    : Icons.download_for_offline_rounded,
+                color: _isDownloaded
+                    ? Default_Theme.accentColor2
+                    : Default_Theme.primaryColor1,
+              ),
+        onPressed: _isDownloaded || _isDownloading
+            ? null
+            : () async {
+                setState(() => _isDownloading = true);
+                try {
+                  await context
+                      .read<DownloaderCubit>()
+                      .downloadSong(mediaItemToTrack(currentMedia));
+                  await _queryDownloadState(currentMedia);
+                } finally {
+                  if (mounted) setState(() => _isDownloading = false);
+                }
+              },
       ),
     );
   }
@@ -577,7 +601,7 @@ class _PlayerControlsRow extends StatelessWidget {
       children: [
         _buildControlColumn(
           top: IconButton(
-            icon: const Icon(MingCute.alarm_1_line,
+            icon: const Icon(Icons.alarm_rounded,
                 color: Default_Theme.primaryColor1, size: 28),
             onPressed: () => Navigator.push(
                 context, MaterialPageRoute(builder: (_) => const TimerView())),
@@ -586,12 +610,12 @@ class _PlayerControlsRow extends StatelessWidget {
         ),
         _buildControlColumn(
           top: IconButton(
-            icon: const Icon(MingCute.skip_previous_fill,
+            icon: const Icon(Icons.skip_previous_rounded,
                 color: Default_Theme.primaryColor1, size: 35),
             onPressed: musicPlayer.skipToPrevious,
           ),
           bottom: IconButton(
-            icon: const Icon(MingCute.align_center_line,
+            icon: const Icon(Icons.lyrics_rounded,
                 color: Default_Theme.primaryColor1, size: 24),
             onPressed: () {
               Navigator.of(context).push(PageRouteBuilder(
@@ -609,12 +633,12 @@ class _PlayerControlsRow extends StatelessWidget {
         ),
         _buildControlColumn(
           top: IconButton(
-            icon: const Icon(MingCute.skip_forward_fill,
+            icon: const Icon(Icons.skip_next_rounded,
                 color: Default_Theme.primaryColor1, size: 35),
             onPressed: musicPlayer.skipToNext,
           ),
           bottom: IconButton(
-            icon: const Icon(MingCute.settings_6_line,
+            icon: const Icon(Icons.settings_rounded,
                 color: Default_Theme.primaryColor1, size: 24),
             onPressed: () => Navigator.push(context,
                 MaterialPageRoute(builder: (_) => const PlayerSettings())),
@@ -647,10 +671,10 @@ class _LoopControl extends StatelessWidget {
           ],
           child: Icon(
             loopMode == LoopMode.off
-                ? MingCute.repeat_line
+                ? Icons.repeat_rounded
                 : loopMode == LoopMode.one
-                    ? MingCute.repeat_one_line
-                    : MingCute.repeat_fill,
+                    ? Icons.repeat_one_rounded
+                    : Icons.repeat_rounded,
             color: loopMode == LoopMode.off
                 ? Default_Theme.primaryColor1
                 : Default_Theme.accentColor1,
@@ -680,7 +704,7 @@ class _ShuffleControl extends StatelessWidget {
         final isShuffle = snapshot.data ?? false;
         return IconButton(
           icon: Icon(
-            MingCute.shuffle_2_fill,
+            Icons.shuffle_rounded,
             color: isShuffle
                 ? Default_Theme.accentColor1
                 : Default_Theme.primaryColor1,
@@ -700,7 +724,7 @@ class _ExternalLinkControl extends StatelessWidget {
   Widget build(BuildContext context) {
     final player = context.read<BloomeePlayerCubit>().bloomeePlayer;
     return IconButton(
-      icon: const Icon(MingCute.external_link_line,
+      icon: const Icon(Icons.open_in_new_rounded,
           color: Default_Theme.primaryColor1, size: 24),
       onPressed: () async {
         final url = player.currentTrackInfo.url;
@@ -733,11 +757,11 @@ class _PlayPauseButton extends StatelessWidget {
               ? Default_Theme.accentColor1
               : Default_Theme.accentColor2;
         } else if (state.isCompleted) {
-          child = const Icon(FontAwesome.rotate_right_solid,
+          child = const Icon(Icons.replay_rounded,
               color: Default_Theme.primaryColor1, size: 32);
           buttonColor = Default_Theme.accentColor1;
         } else if (state.hasError) {
-          child = const Icon(MingCute.warning_line,
+          child = const Icon(Icons.warning_amber_rounded,
               color: Default_Theme.primaryColor1, size: 32);
         } else if (state.isVisible) {
           return PlayPauseButton(
@@ -779,9 +803,9 @@ class _PlayPauseButton extends StatelessWidget {
   }
 }
 
-/// FIX M-06: Replaced async palette fetch inside build() with a proper
-/// lifecycle-based approach using a stream subscription.
-/// The fetch only triggers when the artUri CHANGES, not on every rebuild.
+/// Full-player artwork ambience. The artwork is deliberately blurred and
+/// darkened so controls remain readable while the current song still drives
+/// the visual mood. It avoids palette extraction and an extra network pass.
 class AmbientImgShadowWidget extends StatefulWidget {
   const AmbientImgShadowWidget({super.key});
 
@@ -790,40 +814,20 @@ class AmbientImgShadowWidget extends StatefulWidget {
 }
 
 class _AmbientImgShadowWidgetState extends State<AmbientImgShadowWidget> {
-  Color? _cachedColor;
-  String? _lastArtUri;
+  String? _imageUrl;
   StreamSubscription? _mediaSub;
-  bool _fetchingPalette = false;
 
   @override
   void initState() {
     super.initState();
     final player = context.read<BloomeePlayerCubit>().bloomeePlayer;
-    _mediaSub = player.mediaItem.listen((mi) {
-      final artUri = mi?.artUri?.toString();
-      if (artUri != _lastArtUri) {
-        _lastArtUri = artUri;
-        _fetchPalette(artUri);
-      }
-    });
-    // Initial fetch
-    final current = player.mediaItem.valueOrNull;
-    _lastArtUri = current?.artUri?.toString();
-    _fetchPalette(_lastArtUri);
+    _setImage(player.mediaItem.valueOrNull);
+    _mediaSub = player.mediaItem.listen(_setImage);
   }
 
-  Future<void> _fetchPalette(String? artUri) async {
-    if (artUri == null || artUri.isEmpty || _fetchingPalette) return;
-    _fetchingPalette = true;
-    try {
-      final palette = await getPalleteFromImage(artUri);
-      if (mounted) {
-        setState(() => _cachedColor = palette.dominantColor?.color);
-      }
-    } catch (_) {
-    } finally {
-      _fetchingPalette = false;
-    }
+  void _setImage(MediaItem? mediaItem) {
+    final next = mediaItem?.artUri?.toString();
+    if (next != _imageUrl && mounted) setState(() => _imageUrl = next);
   }
 
   @override
@@ -834,20 +838,41 @@ class _AmbientImgShadowWidgetState extends State<AmbientImgShadowWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final imageUrl = _imageUrl;
+    if (imageUrl == null || imageUrl.isEmpty) {
+      return const ColoredBox(color: Default_Theme.themeColor);
+    }
     return RepaintBoundary(
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 500),
-        decoration: BoxDecoration(
-          gradient: RadialGradient(
-            colors: [
-              (_cachedColor ?? const Color.fromARGB(255, 163, 44, 115))
-                  .withValues(alpha: 0.35),
-              Colors.transparent,
-            ],
-            center: Alignment.center,
-            radius: 0.70,
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          ClipRect(
+            child: ImageFiltered(
+              imageFilter: ui.ImageFilter.blur(
+                sigmaX: 28,
+                sigmaY: 28,
+                tileMode: TileMode.clamp,
+              ),
+              child: Transform.scale(
+                scale: 1.18,
+                child: LoadImageCached(imageUrl: imageUrl, fit: BoxFit.cover),
+              ),
+            ),
           ),
-        ),
+          const DecoratedBox(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  Color(0x78151817),
+                  Color(0xA8151817),
+                  Color(0xE8151817),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

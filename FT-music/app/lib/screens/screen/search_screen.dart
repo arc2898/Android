@@ -3,7 +3,6 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:icons_plus/icons_plus.dart';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:ft_music/blocs/settings_cubit/cubit/settings_cubit.dart';
@@ -79,8 +78,15 @@ class _SearchScreenState extends State<SearchScreen> {
       final persistedId = context.read<SettingsCubit>().state.searchPluginId;
       final hasPersistedPlugin = persistedId.isNotEmpty &&
           resolvers.any((p) => p.manifest.id == persistedId);
-      final activeId =
-          hasPersistedPlugin ? persistedId : resolvers.first.manifest.id;
+      final spotifyResolver = resolvers.where((plugin) {
+        final label = '${plugin.name} ${plugin.manifest.id}'.toLowerCase();
+        return label.contains('spotify');
+      });
+      final activeId = hasPersistedPlugin
+          ? persistedId
+          : (spotifyResolver.isNotEmpty
+              ? spotifyResolver.first.manifest.id
+              : resolvers.first.manifest.id);
 
       _activePluginIdNotifier.value = activeId;
       _contentBloc.add(SetActiveContentPlugin(pluginId: activeId));
@@ -407,7 +413,7 @@ class _FloatingSearchBarSliver extends StatelessWidget {
                         return IconButton(
                           splashColor: Colors.transparent,
                           highlightColor: Colors.transparent,
-                          icon: Icon(MingCute.close_fill,
+                          icon: Icon(Icons.close_rounded,
                               color: Default_Theme.primaryColor1
                                   .withValues(alpha: 0.5),
                               size: 18),
@@ -455,7 +461,7 @@ class _FloatingSearchBarSliver extends StatelessWidget {
                       color:
                           Default_Theme.primaryColor1.withValues(alpha: 0.5)),
                 )
-              : Icon(MingCute.search_2_line,
+              : Icon(Icons.search_rounded,
                   key: const ValueKey('search-idle'),
                   color: Default_Theme.primaryColor1.withValues(alpha: 0.5),
                   size: 20),
@@ -586,7 +592,7 @@ class _PluginsGlassyBoxSliver extends StatelessWidget {
                         child: Row(
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            const Icon(MingCute.plugin_2_line,
+                            const Icon(Icons.extension_rounded,
                                 size: 18, color: Default_Theme.accentColor2),
                             const SizedBox(width: 8),
                             Text(
@@ -705,7 +711,7 @@ class _PluginChip extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   if (isSelected) ...[
-                    const Icon(MingCute.check_line,
+                    const Icon(Icons.check_rounded,
                         size: 13, color: Default_Theme.accentColor2),
                     const SizedBox(width: 4),
                   ],
@@ -829,23 +835,23 @@ class _SuggestionsSliver extends StatelessWidget {
                 hasScrollBody: false,
                 child: SignBoardWidget(
                     message: AppLocalizations.of(context)!.searchStartTyping,
-                    icon: MingCute.keyboard_line));
+                    icon: Icons.keyboard_rounded));
           }
           if (combined.isEmpty) {
             return SliverFillRemaining(
                 hasScrollBody: false,
                 child: SignBoardWidget(
                     message: AppLocalizations.of(context)!.searchNoSuggestions,
-                    icon: MingCute.ghost_line));
+                    icon: Icons.auto_awesome_rounded));
           }
 
           final children = <Widget>[
             const SizedBox(height: 12),
             if (dbList.isNotEmpty) ...[
-              _buildSuggestionSectionHeader('Recent', MingCute.history_line),
+              _buildSuggestionSectionHeader('Recent', Icons.history_rounded),
               ...dbList.asMap().entries.map((e) => _SuggestionTile(
                     suggestion: e.value,
-                    icon: MingCute.history_line,
+                    icon: Icons.history_rounded,
                     isHistory: true,
                     globalIndex: e.key,
                     highlightedIndexNotifier: highlightedIndexNotifier,
@@ -871,10 +877,10 @@ class _SuggestionsSliver extends StatelessWidget {
             ],
             if (apiList.isNotEmpty) ...[
               _buildSuggestionSectionHeader(
-                  'Suggestions', MingCute.search_2_line),
+                  'Suggestions', Icons.search_rounded),
               ...apiList.asMap().entries.map((e) => _SuggestionTile(
                     suggestion: e.value,
-                    icon: MingCute.search_line,
+                    icon: Icons.search_rounded,
                     isHistory: false,
                     globalIndex: e.key + dbList.length,
                     highlightedIndexNotifier: highlightedIndexNotifier,
@@ -885,7 +891,7 @@ class _SuggestionsSliver extends StatelessWidget {
             ],
             if (entityList.isNotEmpty) ...[
               _buildSuggestionSectionHeader(
-                  'Top Results', MingCute.sparkles_2_line),
+                  'Top Results', Icons.auto_awesome_rounded),
               ...entityList.asMap().entries.map((e) => _EntitySuggestionTile(
                     entity: e.value,
                     globalIndex: e.key + dbList.length + apiList.length,
@@ -906,7 +912,7 @@ class _SuggestionsSliver extends StatelessWidget {
             hasScrollBody: false,
             child: SignBoardWidget(
                 message: AppLocalizations.of(context)!.searchNoSuggestions,
-                icon: MingCute.ghost_line));
+                icon: Icons.auto_awesome_rounded));
       },
     );
   }
@@ -993,7 +999,7 @@ class _SuggestionTile extends StatelessWidget {
                     onTap: () => context
                         .read<SearchSuggestionBloc>()
                         .add(SearchSuggestionClear(suggestion)),
-                    child: Icon(MingCute.close_fill,
+                    child: Icon(Icons.close_rounded,
                         color:
                             Default_Theme.primaryColor1.withValues(alpha: 0.4),
                         size: 18))
@@ -1001,7 +1007,7 @@ class _SuggestionTile extends StatelessWidget {
                 GestureDetector(
                     onTap: () => onPopulate(
                         suggestion.trim().replaceAll(RegExp(r'\s+'), ' ')),
-                    child: Icon(MingCute.arrow_left_up_line,
+                    child: Icon(Icons.north_east_rounded,
                         color:
                             Default_Theme.primaryColor1.withValues(alpha: 0.4),
                         size: 18))
@@ -1148,7 +1154,7 @@ class _EntitySuggestionTile extends StatelessWidget {
       width: 42,
       height: 42,
       color: Default_Theme.primaryColor2.withValues(alpha: 0.15),
-      child: Icon(MingCute.search_line,
+      child: Icon(Icons.search_rounded,
           size: 18, color: Default_Theme.primaryColor1.withValues(alpha: 0.4)));
 }
 
@@ -1167,7 +1173,7 @@ class _ContentSliver extends StatelessWidget {
           return SliverFillRemaining(
               hasScrollBody: false,
               child: SignBoardWidget(
-                  icon: MingCute.wifi_off_line,
+                  icon: Icons.wifi_off_rounded,
                   message: AppLocalizations.of(context)!.emptyNoInternet));
         }
 
@@ -1198,7 +1204,7 @@ class _ContentSliver extends StatelessWidget {
                   hasScrollBody: false,
                   child: SignBoardWidget(
                       message: AppLocalizations.of(context)!.searchNoResults,
-                      icon: MingCute.ghost_line));
+                      icon: Icons.auto_awesome_rounded));
             }
             if (state.searchStatus == SearchStatus.error) {
               return SliverFillRemaining(
@@ -1206,13 +1212,13 @@ class _ContentSliver extends StatelessWidget {
                   child: SignBoardWidget(
                       message: state.error ??
                           AppLocalizations.of(context)!.searchFailed,
-                      icon: MingCute.sweats_line));
+                      icon: Icons.cloud_off_rounded));
             }
             return SliverFillRemaining(
                 hasScrollBody: false,
                 child: SignBoardWidget(
                     message: AppLocalizations.of(context)!.searchDiscover,
-                    icon: MingCute.planet_line));
+                    icon: Icons.public_rounded));
           },
         );
       },

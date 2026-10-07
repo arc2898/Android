@@ -2,7 +2,6 @@
 import 'package:flutter/material.dart';
 
 import 'package:ft_music/core/theme/app_theme.dart';
-import 'package:icons_plus/icons_plus.dart';
 
 class PlayPauseButton extends StatefulWidget {
   final double size;
@@ -130,13 +129,13 @@ class _PlayPauseButtonState extends State<PlayPauseButton>
                 },
                 child: widget.isPlaying
                     ? Icon(
-                        FontAwesome.pause_solid,
+                        Icons.pause_rounded,
                         key: const ValueKey('pause'),
                         size: size * 0.5,
                         color: Default_Theme.primaryColor1,
                       )
                     : Icon(
-                        MingCute.play_fill,
+                        Icons.play_arrow_rounded,
                         key: const ValueKey('play'),
                         size: size * 0.5,
                         color: Default_Theme.primaryColor1,

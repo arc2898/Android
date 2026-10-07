@@ -68,20 +68,9 @@ class _CaraouselWidgetState extends State<CaraouselWidget> {
       listenWhen: (previous, current) =>
           previous.chartsStatus != ChartStatus.loaded &&
           current.chartsStatus == ChartStatus.loaded,
-      listener: (context, chartState) {
-        final pluginId = chartState.activePluginId;
-        if (pluginId == null || chartState.charts.isEmpty) return;
-        final settingsState = context.read<SettingsCubit>().state;
-        final visibleIds = chartState.charts
-            .where((c) => settingsState.chartMap[c.title] ?? true)
-            .map((c) => c.id)
-            .toSet();
-        if (visibleIds.isNotEmpty) {
-          _chartBloc.add(PrefetchAllChartDetails(
-            pluginId: pluginId,
-            chartIds: visibleIds,
-          ));
-        }
+      listener: (_, __) {
+        // Chart details are fetched only when a user opens a chart. This
+        // prevents the home screen from downloading every chart on startup.
       },
       child: BlocBuilder<PluginBloc, PluginState>(
         builder: (context, pluginState) {

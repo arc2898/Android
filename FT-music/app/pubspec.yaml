@@ -84,6 +84,8 @@ dependencies:
   
 
 dependency_overrides:
+  icons_plus:
+    path: third_party/icons_plus
   ffi: ^1.1.2  # Override to make dart_discord_rpc work
 
 

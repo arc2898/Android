@@ -2,7 +2,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:icons_plus/icons_plus.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:ft_music/l10n/app_localizations.dart';
 
@@ -102,7 +101,7 @@ class SongCardWidget extends StatelessWidget {
                             ),
                             child: isPlaying
                                 ? const Icon(
-                                    MingCute.right_fill,
+                                    Icons.graphic_eq_rounded,
                                     key: ValueKey('playing_icon'),
                                     color: Default_Theme.accentColor2,
                                     size: 18,
@@ -196,13 +195,13 @@ class SongCardWidget extends StatelessWidget {
                       children: [
                         if (showPlayBtn)
                           _ActionButton(
-                            icon: MingCute.play_circle_fill,
+                            icon: Icons.play_circle_filled_rounded,
                             onTap: onPlayTap,
                             iconSize: 24,
                           ),
                         if (showCopyBtn)
                           _ActionButton(
-                            icon: MingCute.copy_2_line,
+                            icon: Icons.copy_rounded,
                             tooltip: l10n.tooltipCopyToClipboard,
                             onTap: () {
                               Clipboard.setData(ClipboardData(
@@ -214,7 +213,7 @@ class SongCardWidget extends StatelessWidget {
                           ),
                         if (showInfoBtn)
                           _ActionButton(
-                            icon: MingCute.information_line,
+                            icon: Icons.info_outline_rounded,
                             tooltip: l10n.tooltipSongInfo,
                             onTap: () {
                               if (onInfoTap != null) {
@@ -230,7 +229,7 @@ class SongCardWidget extends StatelessWidget {
                           ),
                         if (delDownBtn)
                           _ActionButton(
-                            icon: MingCute.delete_2_line,
+                            icon: Icons.delete_outline_rounded,
                             iconColor: Colors.redAccent.withValues(alpha: 0.9),
                             onTap: () {
                               try {
@@ -256,7 +255,7 @@ class SongCardWidget extends StatelessWidget {
                           ),
                         if (showOptions)
                           _ActionButton(
-                            icon: MingCute.more_2_fill,
+                            icon: Icons.more_horiz_rounded,
                             onTap: onOptionsTap,
                           ),
                         if (trailing != null) trailing!,

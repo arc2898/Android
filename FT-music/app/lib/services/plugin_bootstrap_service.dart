@@ -319,9 +319,9 @@ class PluginBootstrapService {
       final currentHome =
           await settingsDao.getSettingStr(SettingKeys.homePluginId);
       if (currentHome == null || currentHome.isEmpty) {
-        final homePlugin = available.firstWhere(
+        final homePlugin = _preferredPlugin(
+          available,
           (p) => p.pluginType == PluginType.contentResolver,
-          orElse: () => throw StateError('none'),
         );
         await settingsDao.putSettingStr(
             SettingKeys.homePluginId, homePlugin.manifest.id);
@@ -329,12 +329,31 @@ class PluginBootstrapService {
             name: 'PluginBootstrap');
       }
 
+      final currentPriority =
+          await settingsDao.getSettingStr(SettingKeys.resolverPriority);
+      if (currentPriority == null || currentPriority.isEmpty) {
+        final resolverIds = available
+            .where((p) => p.pluginType == PluginType.contentResolver)
+            .toList()
+          ..sort((a, b) {
+            final aSpotify =
+                '${a.name} ${a.manifest.id}'.toLowerCase().contains('spotify');
+            final bSpotify =
+                '${b.name} ${b.manifest.id}'.toLowerCase().contains('spotify');
+            return (bSpotify ? 1 : 0).compareTo(aSpotify ? 1 : 0);
+          });
+        await settingsDao.putSettingStr(
+          SettingKeys.resolverPriority,
+          jsonEncode(resolverIds.map((p) => p.manifest.id).toList()),
+        );
+      }
+
       final currentSearch =
           await settingsDao.getSettingStr(SettingKeys.searchPluginId);
       if (currentSearch == null || currentSearch.isEmpty) {
-        final searchPlugin = available.firstWhere(
+        final searchPlugin = _preferredPlugin(
+          available,
           (p) => p.pluginType == PluginType.contentResolver,
-          orElse: () => throw StateError('none'),
         );
         await settingsDao.putSettingStr(
             SettingKeys.searchPluginId, searchPlugin.manifest.id);
@@ -342,6 +361,24 @@ class PluginBootstrapService {
             name: 'PluginBootstrap');
       }
     } catch (_) {}
+  }
+
+  /// Spotify is the preferred source when a compatible plugin is installed.
+  /// The fallback keeps the app functional for installations without one.
+  static PluginInfo _preferredPlugin(
+    List<PluginInfo> plugins,
+    bool Function(PluginInfo) matches,
+  ) {
+    final candidates = plugins.where(matches).toList();
+    if (candidates.isEmpty) throw StateError('none');
+    candidates.sort((a, b) {
+      final aSpotify =
+          '${a.name} ${a.manifest.id}'.toLowerCase().contains('spotify');
+      final bSpotify =
+          '${b.name} ${b.manifest.id}'.toLowerCase().contains('spotify');
+      return (bSpotify ? 1 : 0).compareTo(aSpotify ? 1 : 0);
+    });
+    return candidates.first;
   }
 
   static Future<void> syncOnAppOpenIfDue({
@@ -435,7 +472,8 @@ class PluginBootstrapService {
         try {
           // Check if plugin is currently loaded RIGHT NOW (not from snapshot)
           // — auto-load may have loaded it since the snapshot was taken.
-          final currentlyLoaded = pluginService.getLoadedPlugins().contains(pluginId);
+          final currentlyLoaded =
+              pluginService.getLoadedPlugins().contains(pluginId);
           if (currentlyLoaded) {
             try {
               await pluginService.unloadPlugin(

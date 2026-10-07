@@ -14,7 +14,6 @@ import 'package:ft_music/plugins/blocs/content/content_state.dart';
 import 'package:ft_music/plugins/blocs/plugin/plugin_bloc.dart';
 import 'package:ft_music/plugins/blocs/plugin/plugin_state.dart';
 import 'package:ft_music/screens/screen/home_views/recents_view.dart';
-import 'package:ft_music/screens/screen/home_views/setting_views/about.dart';
 import 'package:ft_music/screens/widgets/more_bottom_sheet.dart';
 import 'package:ft_music/screens/widgets/sign_board_widget.dart';
 import 'package:ft_music/screens/widgets/song_tile.dart';
@@ -25,10 +24,9 @@ import 'package:ft_music/screens/screen/home_views/timer_view.dart';
 import 'package:ft_music/core/theme/app_theme.dart';
 import 'package:ft_music/l10n/app_localizations.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:icons_plus/icons_plus.dart';
-import 'chart/carousal_widget.dart';
 import '../widgets/horizontal_card_view.dart';
 import '../widgets/tab_list_widget.dart';
+import '../widgets/home_category_carousel.dart';
 import 'package:badges/badges.dart' as badges;
 
 class ExploreScreen extends StatefulWidget {
@@ -86,7 +84,14 @@ class _ExploreScreenState extends State<ExploreScreen> {
     final preferredId = context.read<SettingsCubit>().state.homePluginId;
     final hasPreferred = preferredId.isNotEmpty &&
         loadedResolvers.any((plugin) => plugin.manifest.id == preferredId);
-    return hasPreferred ? preferredId : loadedResolvers.first.manifest.id;
+    if (hasPreferred) return preferredId;
+    final spotify = loadedResolvers.where((plugin) {
+      final label = '${plugin.name} ${plugin.manifest.id}'.toLowerCase();
+      return label.contains('spotify');
+    });
+    return (spotify.isNotEmpty ? spotify.first : loadedResolvers.first)
+        .manifest
+        .id;
   }
 
   @override
@@ -180,7 +185,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
                 SliverList(
                   delegate: SliverChildListDelegate(
                     [
-                      const CaraouselWidget(),
+                      const HomeCategoryCarousel(),
                       Padding(
                         padding: const EdgeInsets.only(top: 15.0),
                         child: SizedBox(
@@ -303,7 +308,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
                             return const SignBoardWidget(
                               message:
                                   'No content plugin loaded.\nLoad a Content Resolver in Plugin Manager.',
-                              icon: MingCute.plugin_2_line,
+                              icon: Icons.extension_rounded,
                             );
                           }
 
@@ -322,7 +327,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
                               child: SignBoardWidget(
                                 message:
                                     'Refreshing Discover source...\nThe previous source is no longer available.',
-                                icon: MingCute.warning_line,
+                                icon: Icons.warning_amber_rounded,
                               ),
                             );
                           }
@@ -346,7 +351,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
                                     padding: EdgeInsets.symmetric(vertical: 16),
                                     child: SignBoardWidget(
                                       message: 'No Internet Connection!',
-                                      icon: MingCute.wifi_off_line,
+                                      icon: Icons.wifi_off_rounded,
                                     ),
                                   );
                                 }
@@ -377,7 +382,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
                               child: SignBoardWidget(
                                 message: state.error ??
                                     'Failed to load home sections.',
-                                icon: MingCute.sweats_line,
+                                icon: Icons.cloud_off_rounded,
                               ),
                             );
                           }
@@ -462,24 +467,48 @@ class CustomDiscoverBar extends StatelessWidget {
       surfaceTintColor: Default_Theme.themeColor,
       backgroundColor: Default_Theme.themeColor,
       title: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          Text(
-            AppLocalizations.of(context)!.exploreDiscover,
-            style: Default_Theme.primaryTextStyle.merge(
-              const TextStyle(
-                fontSize: 34,
-                color: Default_Theme.primaryColor1,
-              ),
-            ),
-          ),
+          const _FTMusicBrand(),
           const Spacer(),
           const NotificationIcon(),
-          const SiteIcon(),
           const TimerIcon(),
           const SettingsIcon(),
         ],
       ),
+    );
+  }
+}
+
+class _FTMusicBrand extends StatelessWidget {
+  const _FTMusicBrand();
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        ClipRRect(
+          borderRadius: BorderRadius.circular(10),
+          child: Image.asset(
+            'assets/icons/ft_music_mark.png',
+            width: 34,
+            height: 34,
+            fit: BoxFit.cover,
+          ),
+        ),
+        const SizedBox(width: 10),
+        Text(
+          'FT-music',
+          style: Default_Theme.secondoryTextStyleMedium.merge(
+            const TextStyle(
+              fontSize: 25,
+              letterSpacing: -0.6,
+              color: Default_Theme.primaryColor1,
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
@@ -504,7 +533,7 @@ class NotificationIcon extends StatelessWidget {
               );
             },
             icon: const Icon(
-              MingCute.notification_line,
+              Icons.notifications_none_rounded,
               color: Default_Theme.primaryColor1,
               size: 30.0,
             ),
@@ -541,7 +570,7 @@ class NotificationIcon extends StatelessWidget {
               );
             },
             icon: const Icon(
-              MingCute.notification_line,
+              Icons.notifications_none_rounded,
               color: Default_Theme.primaryColor1,
               size: 30.0,
             ),
@@ -567,7 +596,7 @@ class TimerIcon extends StatelessWidget {
         );
       },
       icon: const Icon(
-        MingCute.stopwatch_line,
+        Icons.timer_outlined,
         color: Default_Theme.primaryColor1,
         size: 30.0,
       ),
@@ -590,32 +619,9 @@ class SettingsIcon extends StatelessWidget {
         );
       },
       icon: const Icon(
-        MingCute.settings_3_line,
+        Icons.settings_rounded,
         color: Default_Theme.primaryColor1,
         size: 30.0,
-      ),
-    );
-  }
-}
-
-class SiteIcon extends StatelessWidget {
-  const SiteIcon({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return IconButton(
-      padding: const EdgeInsets.all(5),
-      constraints: const BoxConstraints(),
-      onPressed: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => const About()),
-        );
-      },
-      icon: const Icon(
-        MingCute.flower_4_fill,
-        color: Default_Theme.primaryColor1,
-        size: 28.0,
       ),
     );
   }

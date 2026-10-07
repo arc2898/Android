@@ -7,8 +7,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:google_nav_bar/google_nav_bar.dart';
-import 'package:icons_plus/icons_plus.dart';
 import 'package:responsive_framework/responsive_framework.dart';
 
 class GlobalFooter extends StatelessWidget {
@@ -214,18 +212,18 @@ class VerticalNavBar extends StatelessWidget {
       backgroundColor: Default_Theme.themeColor.withValues(alpha: 0.3),
       destinations: [
         NavigationRailDestination(
-            icon: const Icon(MingCute.home_4_fill), label: Text(l10n.navHome)),
+            icon: const Icon(Icons.home_rounded), label: Text(l10n.navHome)),
         NavigationRailDestination(
-            icon: const Icon(MingCute.book_5_fill),
+            icon: const Icon(Icons.library_music_rounded),
             label: Text(l10n.navLibrary)),
         NavigationRailDestination(
-            icon: const Icon(MingCute.search_2_fill),
+            icon: const Icon(Icons.search_rounded),
             label: Text(l10n.navSearch)),
         NavigationRailDestination(
-            icon: const Icon(MingCute.music_2_fill),
+            icon: const Icon(Icons.queue_music_rounded),
             label: Text(l10n.navLocal)),
         NavigationRailDestination(
-            icon: const Icon(MingCute.folder_download_fill),
+            icon: const Icon(Icons.download_rounded),
             label: Text(l10n.navOffline)),
       ],
       selectedIndex: navigationShell.currentIndex,
@@ -249,26 +247,101 @@ class HorizontalNavBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final destinations = [
+      (Icons.home_rounded, l10n.navHome),
+      (Icons.library_music_rounded, l10n.navLibrary),
+      (Icons.search_rounded, l10n.navSearch),
+      (Icons.queue_music_rounded, l10n.navLocal),
+      (Icons.download_rounded, l10n.navOffline),
+    ];
 
-    return GNav(
-      gap: 7.0,
-      tabBackgroundColor: Default_Theme.accentColor2.withValues(alpha: 0.22),
-      color: Default_Theme.primaryColor2,
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      activeColor: Default_Theme.accentColor2,
-      textStyle: Default_Theme.secondoryTextStyleMedium.merge(
-          const TextStyle(color: Default_Theme.accentColor2, fontSize: 18)),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-      backgroundColor: Default_Theme.themeColor.withValues(alpha: 0.3),
-      tabs: [
-        GButton(icon: MingCute.home_4_fill, text: l10n.navHome),
-        GButton(icon: MingCute.book_5_fill, text: l10n.navLibrary),
-        GButton(icon: MingCute.search_2_fill, text: l10n.navSearch),
-        GButton(icon: MingCute.music_2_fill, text: l10n.navLocal),
-        GButton(icon: MingCute.folder_download_fill, text: l10n.navOffline),
-      ],
-      selectedIndex: navigationShell.currentIndex,
-      onTabChange: navigationShell.goBranch,
+    return Container(
+      height: 68,
+      padding: const EdgeInsets.all(6),
+      decoration: BoxDecoration(
+        color: Default_Theme.surfaceElevated,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(
+          color: Default_Theme.primaryColor1.withValues(alpha: .06),
+        ),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x55000000),
+            blurRadius: 24,
+            offset: Offset(0, 8),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          for (var index = 0; index < destinations.length; index++)
+            Expanded(
+              child: _BottomNavItem(
+                icon: destinations[index].$1,
+                label: destinations[index].$2,
+                selected: navigationShell.currentIndex == index,
+                onTap: () => navigationShell.goBranch(index),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+class _BottomNavItem extends StatelessWidget {
+  const _BottomNavItem({
+    required this.icon,
+    required this.label,
+    required this.selected,
+    required this.onTap,
+  });
+
+  final IconData icon;
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final color = selected
+        ? const Color(0xFF182014)
+        : Default_Theme.primaryColor2.withValues(alpha: .82);
+    return Semantics(
+      button: true,
+      selected: selected,
+      label: label,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(18),
+        onTap: onTap,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 180),
+          curve: Curves.easeOutCubic,
+          margin: const EdgeInsets.symmetric(horizontal: 2),
+          decoration: BoxDecoration(
+            color: selected ? Default_Theme.accentColor2 : Colors.transparent,
+            borderRadius: BorderRadius.circular(18),
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(icon, color: color, size: selected ? 22 : 21),
+              const SizedBox(height: 3),
+              Text(
+                label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  color: color,
+                  fontFamily: 'Gilroy',
+                  fontSize: 10,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

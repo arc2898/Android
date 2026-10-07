@@ -21,7 +21,6 @@ import 'package:ft_music/screens/widgets/create_playlist_bottomsheet.dart';
 import 'package:ft_music/screens/widgets/libitem_tile.dart';
 import 'package:ft_music/core/theme/app_theme.dart';
 import 'package:ft_music/l10n/app_localizations.dart';
-import 'package:icons_plus/icons_plus.dart';
 import 'package:ft_music/blocs/library/search_cubit/library_search_cubit.dart';
 import 'package:ft_music/core/models/library_search_result.dart';
 import 'package:ft_music/screens/widgets/animated_list_item.dart';
@@ -130,7 +129,7 @@ class _LibraryScreenViewState extends State<_LibraryScreenView> {
                       child: SignBoardWidget(
                         message:
                             AppLocalizations.of(context)!.libraryEmptyState,
-                        icon: MingCute.playlist_fill,
+                        icon: Icons.queue_music_rounded,
                       ),
                     ),
                   ),
@@ -184,7 +183,7 @@ class _LibraryScreenViewState extends State<_LibraryScreenView> {
                           child: SignBoardWidget(
                             message:
                                 AppLocalizations.of(context)!.emptyNoResults,
-                            icon: MingCute.search_line,
+                            icon: Icons.search_rounded,
                           ),
                         ),
                       ),
@@ -312,7 +311,7 @@ class _LibraryScreenViewState extends State<_LibraryScreenView> {
               ),
             ),
             prefixIcon: Icon(
-              MingCute.search_line,
+              Icons.search_rounded,
               color: Default_Theme.primaryColor1.withValues(alpha: 0.5),
               size: 20,
             ),
@@ -326,7 +325,7 @@ class _LibraryScreenViewState extends State<_LibraryScreenView> {
                       : IconButton(
                           key: const ValueKey('clear'),
                           icon: Icon(
-                            MingCute.close_fill,
+                            Icons.close_rounded,
                             color: Default_Theme.primaryColor1
                                 .withValues(alpha: 0.5),
                             size: 18,
@@ -417,7 +416,7 @@ class _LibraryScreenViewState extends State<_LibraryScreenView> {
               }
             },
             icon: Icon(
-              _isSearching ? MingCute.close_fill : MingCute.search_line,
+              _isSearching ? Icons.close_rounded : Icons.search_rounded,
               size: 24,
               color: _isSearching
                   ? Default_Theme.accentColor2
@@ -427,7 +426,7 @@ class _LibraryScreenViewState extends State<_LibraryScreenView> {
           IconButton(
             padding: const EdgeInsets.all(8),
             onPressed: () => createPlaylistDialog(context),
-            icon: const Icon(MingCute.add_fill,
+            icon: const Icon(Icons.add_rounded,
                 size: 25, color: Default_Theme.primaryColor1),
           ),
           IconButton(
@@ -447,7 +446,7 @@ class _LibraryScreenViewState extends State<_LibraryScreenView> {
                 context.pushNamed(RoutePaths.importMediaFromPlatforms);
               }
             },
-            icon: const Icon(FontAwesome.file_import_solid,
+            icon: const Icon(Icons.file_upload_rounded,
                 size: 22, color: Default_Theme.primaryColor1),
           ),
         ],

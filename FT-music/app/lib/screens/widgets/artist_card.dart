@@ -4,7 +4,6 @@ import 'package:ft_music/screens/screen/common_views/artist_view.dart';
 import 'package:ft_music/core/theme/app_theme.dart';
 import 'package:ft_music/utils/load_image.dart';
 import 'package:flutter/material.dart';
-import 'package:icons_plus/icons_plus.dart';
 
 class ArtistCard extends StatefulWidget {
   final ArtistSummary artist;
@@ -79,7 +78,7 @@ class _ArtistCardState extends State<ArtistCard> {
                               duration: const Duration(milliseconds: 200),
                               opacity: _isHovering ? 1.0 : 0.0,
                               child: const Icon(
-                                MingCute.play_circle_line,
+                                Icons.play_circle_outline_rounded,
                                 color: Colors.white,
                                 size: 50,
                               ),

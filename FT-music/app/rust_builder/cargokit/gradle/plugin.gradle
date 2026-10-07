@@ -129,7 +129,10 @@ class CargoKitPlugin implements Plugin<Project> {
             final buildType = variant.buildType.name
 
             def cargoOutputDir = "${project.buildDir}/jniLibs/${buildType}";
-            def jniLibs = project.android.sourceSets.maybeCreate(buildType).jniLibs;
+            // AGP 8.11 does not expose Flutter's profile variant as a library
+            // source set. Profile uses the debug native output in this module.
+            def sourceSetName = buildType == "profile" ? "debug" : buildType;
+            def jniLibs = project.android.sourceSets.maybeCreate(sourceSetName).jniLibs;
             jniLibs.srcDir(new File(cargoOutputDir))
 
             def platforms = com.flutter.gradle.FlutterPluginUtils.getTargetPlatforms(project).collect()

@@ -1,7 +1,6 @@
 import 'package:ft_music/core/theme/app_theme.dart';
 import 'package:ft_music/utils/load_image.dart';
 import 'package:flutter/material.dart';
-import 'package:icons_plus/icons_plus.dart';
 
 class SquareImgCard extends StatefulWidget {
   final String imgPath;
@@ -12,6 +11,7 @@ class SquareImgCard extends StatefulWidget {
   final String? tag;
   final bool isWide;
   final bool isList;
+  final double? cardSize;
 
   const SquareImgCard({
     super.key,
@@ -23,6 +23,7 @@ class SquareImgCard extends StatefulWidget {
     this.isWide = false,
     this.tag,
     this.isList = true,
+    this.cardSize,
   });
 
   @override
@@ -61,7 +62,7 @@ class _SquareImgCardState extends State<SquareImgCard> {
             opacity: _pressed ? 0.85 : 1.0,
             duration: const Duration(milliseconds: 120),
             child: SizedBox(
-              width: widget.isWide ? 250 : 150,
+              width: widget.cardSize ?? (widget.isWide ? 250 : 150),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -70,8 +71,8 @@ class _SquareImgCardState extends State<SquareImgCard> {
                     borderRadius: BorderRadius.circular(15),
                     child: Stack(children: [
                       SizedBox(
-                        height: 150,
-                        width: widget.isWide ? 250 : 150,
+                        height: widget.cardSize ?? 150,
+                        width: widget.cardSize ?? (widget.isWide ? 250 : 150),
                         child: LoadImageCached(
                           imageUrl: widget.imgPath,
                           fallbackUrl: widget.fallbackImgPath,
@@ -101,7 +102,7 @@ class _SquareImgCardState extends State<SquareImgCard> {
                                       const Padding(
                                         padding: EdgeInsets.only(right: 5),
                                         child: Icon(
-                                          MingCute.playlist_2_line,
+                                          Icons.queue_music_rounded,
                                           size: 18,
                                           color: Default_Theme.primaryColor2,
                                         ),
@@ -125,7 +126,7 @@ class _SquareImgCardState extends State<SquareImgCard> {
                                       const Padding(
                                         padding: EdgeInsets.only(right: 5),
                                         child: Icon(
-                                          MingCute.eye_2_line,
+                                          Icons.visibility_outlined,
                                           size: 18,
                                           color: Default_Theme.primaryColor2,
                                         ),

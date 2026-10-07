@@ -153,11 +153,110 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   GestureBinding.instance.resamplingEnabled = true;
   MediaKit.ensureInitialized();
+  final initialization = _initializeApplication();
+  runApp(_StartupApp(initialization: initialization));
+}
+
+Future<void> _initializeApplication() async {
   await bootstrapApp();
-  setHighRefreshRate();
+  unawaited(setHighRefreshRate());
   await setupPlayerCubit();
   DiscordService.initialize();
-  runApp(const MyApp());
+}
+
+class _StartupApp extends StatelessWidget {
+  final Future<void> initialization;
+
+  const _StartupApp({required this.initialization});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      theme: Default_Theme().defaultThemeData,
+      home: FutureBuilder<void>(
+        future: initialization,
+        builder: (context, snapshot) {
+          if (snapshot.hasError) {
+            return _StartupError(error: snapshot.error!);
+          }
+          if (snapshot.connectionState != ConnectionState.done) {
+            return const _StartupSplash();
+          }
+          return const MyApp();
+        },
+      ),
+    );
+  }
+}
+
+class _StartupSplash extends StatelessWidget {
+  const _StartupSplash();
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Default_Theme.themeColor,
+      body: Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 86,
+              height: 86,
+              padding: const EdgeInsets.all(14),
+              decoration: BoxDecoration(
+                color: Default_Theme.accentColor2,
+                borderRadius: BorderRadius.circular(26),
+              ),
+              child: Image.asset('assets/icons/ft_music_mark.png'),
+            ),
+            const SizedBox(height: 22),
+            const Text(
+              'FT-music',
+              style: TextStyle(
+                color: Default_Theme.primaryColor1,
+                fontSize: 25,
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+            const SizedBox(height: 22),
+            const SizedBox(
+              width: 24,
+              height: 24,
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                color: Default_Theme.accentColor2,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _StartupError extends StatelessWidget {
+  final Object error;
+
+  const _StartupError({required this.error});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Default_Theme.themeColor,
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(28),
+          child: Text(
+            'FT-music could not start.\n$error',
+            textAlign: TextAlign.center,
+            style: const TextStyle(color: Default_Theme.primaryColor1),
+          ),
+        ),
+      ),
+    );
+  }
 }
 
 class MyApp extends StatefulWidget {
@@ -362,7 +461,6 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
           create: (context) => NotificationCubit(
             notificationDao: NotificationDAO(DBProvider.db),
           ),
-          lazy: false,
         ),
         BlocProvider(
             create: (context) => TimerBloc(
@@ -373,15 +471,12 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
         ),
         BlocProvider(
           create: (context) => CurrentPlaylistCubit(playlistDao: playlistDao),
-          lazy: false,
         ),
         BlocProvider(
           create: (context) => RecentlyCubit(historyDao),
-          lazy: false,
         ),
         BlocProvider(
           create: (context) => HistoryCubit(historyDao: historyDao),
-          lazy: false,
         ),
         BlocProvider(
           create: (context) => LibraryItemsCubit(
@@ -395,7 +490,6 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
         ),
         BlocProvider(
           create: (context) => AddToPlaylistCubit(),
-          lazy: false,
         ),
         BlocProvider(
           create: (context) => SearchSuggestionBloc(
@@ -419,7 +513,6 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
             settingsDao: SettingsDAO(DBProvider.db),
             pluginService: ServiceLocator.pluginService,
           ),
-          lazy: false,
         ),
         BlocProvider(
           create: (context) => DownloaderCubit(
@@ -431,13 +524,11 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
             settingsDao: SettingsDAO(DBProvider.db),
             pluginService: ServiceLocator.pluginService,
           ),
-          lazy: false,
         ),
         BlocProvider(
           create: (context) => GlobalEventsCubit(
             settingsDao: SettingsDAO(DBProvider.db),
           ),
-          lazy: false,
         ),
         BlocProvider(
           create: (context) => PlayerOverlayCubit(),
@@ -445,7 +536,6 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
         ),
         BlocProvider(
           create: (context) => ShortcutIndicatorCubit(),
-          lazy: false,
         ),
         BlocProvider(
           create: (context) => LocalMusicCubit(),

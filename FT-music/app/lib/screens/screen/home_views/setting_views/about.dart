@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:ft_music/l10n/app_localizations.dart';
-import 'package:icons_plus/icons_plus.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'dart:ui';
@@ -119,7 +118,7 @@ class About extends StatelessWidget {
                     shaderCallback: (bounds) => kTitleGradient.createShader(
                       Rect.fromLTWH(0, 0, bounds.width, bounds.height),
                     ),
-                    // Use Wrap so title + flower can wrap on narrow widths.
+                    // Keep the wordmark and app mark together on narrow screens.
                     child: const Wrap(
                       alignment: WrapAlignment.center,
                       crossAxisAlignment: WrapCrossAlignment.center,
@@ -133,8 +132,14 @@ class About extends StatelessWidget {
                             fontFamily: 'Gilroy',
                           ),
                         ),
-                        // Small animated flower
-                        GentleRotatingFlower(size: 28),
+                        ClipRRect(
+                          borderRadius: BorderRadius.all(Radius.circular(8)),
+                          child: Image(
+                            image: AssetImage('assets/icons/ft_music_mark.png'),
+                            width: 28,
+                            height: 28,
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -218,7 +223,7 @@ class About extends StatelessWidget {
                       }),
                   // Short label 'Email' opens mail composer
                   _InfoPill(
-                      icon: FontAwesome.x_twitter_brand,
+                      icon: Icons.alternate_email_rounded,
                       text: 'Contact',
                       tooltip: l10n.aboutSendInquiry,
                       onTap: () {
@@ -229,7 +234,7 @@ class About extends StatelessWidget {
                       }),
                   // Short label 'Linkedin' opens Linkedin profile
                   _InfoPill(
-                      icon: FontAwesome.linkedin_brand,
+                      icon: Icons.link_rounded,
                       text: 'Linkedin',
                       tooltip: l10n.aboutCreativeHighlights,
                       onTap: () {
@@ -336,14 +341,13 @@ class About extends StatelessWidget {
             InkWell(
               borderRadius: BorderRadius.circular(8),
               onTap: () {
-                launchUrl(
-                    Uri.parse("https://github.com/arc2898/Android"),
+                launchUrl(Uri.parse("https://github.com/arc2898/Android"),
                     mode: LaunchMode.externalApplication);
               },
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Icon(MingCute.github_fill,
+                  const Icon(Icons.code_rounded,
                       color: kSecondaryTextColor, size: 16),
                   const SizedBox(width: 8),
                   Text(l10n.aboutGitHub,
@@ -629,64 +633,4 @@ class Particle {
       required this.lifespan,
       required this.maxLifespan,
       required this.isSharp});
-}
-
-// A calming, natural-looking rotating flower using a sinusoidal motion.
-class GentleRotatingFlower extends StatefulWidget {
-  final double size;
-  const GentleRotatingFlower({this.size = 28, super.key});
-
-  @override
-  State<GentleRotatingFlower> createState() => _GentleRotatingFlowerState();
-}
-
-class _GentleRotatingFlowerState extends State<GentleRotatingFlower>
-    with SingleTickerProviderStateMixin {
-  late final AnimationController _controller;
-
-  @override
-  void initState() {
-    super.initState();
-    // Slow, calming cycle. Repeats forever.
-    _controller = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 8),
-    )..repeat();
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: _controller,
-      builder: (context, child) {
-        final t = _controller.value; // 0..1
-        // Sinusoidal rotation: small angle in radians (~ +/-9 deg)
-        final angle = sin(t * 2 * pi) * (pi / 20);
-        // Slight 'breathing' scale for softness
-        final scale = 1 + 0.03 * sin(t * 2 * pi);
-        // Gentle horizontal sway in logical pixels
-        final dx = 2.0 * sin(t * 2 * pi);
-
-        return Transform.translate(
-          offset: Offset(dx, 0),
-          child: Transform.rotate(
-            angle: angle,
-            child: Transform.scale(
-              scale: scale,
-              child: Text(
-                "🌸",
-                style: TextStyle(fontSize: widget.size),
-              ),
-            ),
-          ),
-        );
-      },
-    );
-  }
 }

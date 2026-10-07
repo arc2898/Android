@@ -3,7 +3,6 @@ import 'package:ft_music/screens/screen/common_views/playlist_view.dart';
 import 'package:ft_music/core/theme/app_theme.dart';
 import 'package:ft_music/utils/load_image.dart';
 import 'package:flutter/material.dart';
-import 'package:icons_plus/icons_plus.dart';
 
 class PlaylistCard extends StatefulWidget {
   final PlaylistSummary playlist;
@@ -98,7 +97,7 @@ class _PlaylistCardState extends State<PlaylistCard> {
                     opacity: _isHovering ? 1.0 : 0.0,
                     duration: const Duration(milliseconds: 200),
                     child: const Icon(
-                      MingCute.play_circle_line,
+                      Icons.play_circle_outline_rounded,
                       color: Colors.white,
                       size: 42,
                     ),
