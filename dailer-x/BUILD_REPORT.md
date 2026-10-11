@@ -1,26 +1,35 @@
 # Dailer X source validation report
 
-**Source version:** 0.3.0
+**Source version:** 0.3.1  
+**Android version code:** 4  
+**Build verified:** October 11, 2026
 
-## Checks completed in the source-generation environment
+## Verified GitHub Actions build
 
-- Backend unit/API tests: **16 passed**.
-- Backend integration smoke test: `/health`, business search, spam report submission, and lookup/reputation all responded successfully against a local Uvicorn server.
-- Python bytecode compilation: passed.
-- Build script shell syntax (`bash -n`): passed.
-- Android manifest, drawable XML, and bundled SVG assets: parsed successfully.
-- Kotlin parser scan: no syntax/parser diagnostics were found. A full Kotlin compile was not possible without Android/Compose dependencies.
+- [CI run: Dailer X Android CI](https://github.com/arc2898/Android/actions/runs/38131670113)
+- Backend tests: **16 passed**.
+- Android build: **passed** using JDK 17, Android SDK Platform 35, Build Tools 35.0.0, and Gradle 8.9.
+- Gradle task: `:android:app:assembleDebug`.
+- Artifact: `dailer-x-debug-apk` (debug APK, uploaded by CI; artifact retention follows GitHub Actions settings).
+- The active monorepo workflow is `.github/workflows/dailer-x-ci.yml` at the repository root. GitHub does not discover workflows stored only in a subdirectory.
 
-## Android APK compilation status
+## Reproducible Debian / Codespaces build
 
-The Debian build script was executed, but the build stopped while downloading the Android command-line tools because DNS resolution for `dl.google.com` failed in this environment. The Gradle distribution host also fails DNS resolution here. Therefore no APK build or Android type-check is claimed as successful.
+From the `dailer-x` directory, use a network-enabled Debian 12, Ubuntu, or GitHub Codespaces environment:
 
-Run `INSTALL_DEBIAN_DEPS=1 ./scripts/build-debian.sh` in Debian 12, Ubuntu, or GitHub Codespaces with outbound access to Google's Android SDK repository and `services.gradle.org`. It installs the pinned SDK/build tools and Gradle, runs backend tests, and builds `android/app/build/outputs/apk/debug/app-debug.apk`.
+```bash
+INSTALL_DEBIAN_DEPS=1 ./scripts/build-debian.sh
+```
 
-## Platform limitations
+The script provisions Java 17, Android command-line tools, SDK Platform 35, Build Tools 35.0.0, and Gradle 8.9, then runs the backend tests and creates:
 
-- Call screening requires the user-selected Android call-screening role. Auto-blocking is off by default, local allow rules take priority, and backend failures fail open.
-- Notifications and launcher badges depend on user permission and OEM/launcher settings.
-- Ringtone changes alter the device-wide default and require explicit system-settings permission.
-- Generic cellular call recording is not implemented: ordinary third-party apps do not have a reliable public API for call audio across Android/OEM variants. Dailer X does not bypass those restrictions.
-- The caller database contains synthetic demo records only; production requires licensed data and moderation.
+`android/app/build/outputs/apk/debug/app-debug.apk`
+
+## Platform limitations and release checklist
+
+- Call screening must be explicitly granted via Android's call-screening role. Automatic blocking is off by default; local allow rules override block rules; worker overload and backend failures fail open.
+- Backend lookups run off the Android screening callback thread. Caller-ID notifications remain best-effort and depend on notification permission, channel settings, and OEM behavior.
+- Notification badges depend on launcher/OEM settings. Ringtone changes modify the device-wide default and require explicit system-settings access.
+- Generic cellular call recording is not implemented. Ordinary third-party apps lack a reliable public API for capturing cellular call audio across Android/OEM variants; this project does not bypass those restrictions.
+- Demo business listings are synthetic. Production caller identification still requires lawful/licensed directory data, moderation, and dispute/correction workflows.
+- The APK was compiler-verified in CI, not tested on every physical device. Before a public release, test call-screening timing, split-screen/floating-window layouts, notification permission denial, ringtone changes, and Android/OEM-specific behavior on representative devices.
