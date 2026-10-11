@@ -3,7 +3,15 @@ name: Dailer X Android CI
 on:
   push:
     paths:
-      - "dailer-x/**"
+      - "dailer-x/android/**"
+      - "dailer-x/backend/**"
+      - "dailer-x/scripts/**"
+      - "dailer-x/build.gradle.kts"
+      - "dailer-x/settings.gradle.kts"
+      - "dailer-x/gradle.properties"
+      - "dailer-x/docker-compose.yml"
+      - "dailer-x/Dockerfile.debian"
+      - "dailer-x/.github/workflows/**"
       - ".github/workflows/dailer-x-ci.yml"
   pull_request:
     paths:

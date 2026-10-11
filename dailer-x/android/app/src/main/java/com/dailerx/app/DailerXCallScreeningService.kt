@@ -57,7 +57,11 @@ class DailerXCallScreeningService : CallScreeningService() {
     override fun onScreenCall(callDetails: Call.Details) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q &&
             callDetails.callDirection != Call.Details.DIRECTION_INCOMING
-        ) return
+        ) {
+            // Always answer the screening callback. Dailer X only applies caller-ID rules to incoming calls.
+            deliverResponse(callDetails, allow = true)
+            return
+        }
 
         val number = callDetails.handle
             ?.takeIf { it.scheme == "tel" }
