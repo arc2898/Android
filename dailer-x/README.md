@@ -2,7 +2,7 @@
 
 **Dailer X** is an independent, open-source Android phone-number workspace built in Kotlin and Jetpack Compose. This revision uses a tightly controlled **gold, warm-white, and charcoal** identity. App actions are transparent, lightly rounded, outlined controls rather than filled stock buttons.
 
-> **Status:** expanded source MVP. The backend API tests run locally in this environment. Android compilation could not be executed here because Gradle/Android SDK downloads fail with DNS resolution errors. `scripts/build-debian.sh` provisions a Debian/Codespaces toolchain and builds the APK when outbound downloads are available. This is not a production caller-ID database or a replacement for the system phone app.
+> **Status:** build-verified source MVP (v0.3.1). On October 11, 2026, [GitHub Actions built the Android debug APK and passed all 16 backend tests](https://github.com/arc2898/Android/actions/runs/38131670113). Download the `dailer-x-debug-apk` artifact from that run. The project remains an MVP, not a production caller-ID database or a replacement for the system phone app.
 
 ## Features in this source revision
 
