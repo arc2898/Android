@@ -1,0 +1,12 @@
+FROM debian:bookworm-slim
+ENV DEBIAN_FRONTEND=noninteractive \
+    ANDROID_HOME=/opt/android-sdk \
+    ANDROID_SDK_ROOT=/opt/android-sdk \
+    DAILERX_BUILD_CACHE=/opt/dailerx-cache
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ca-certificates curl unzip zip git python3 python3-venv python3-pip openjdk-17-jdk-headless \
+    && rm -rf /var/lib/apt/lists/*
+WORKDIR /workspace
+COPY . /workspace
+RUN chmod +x /workspace/scripts/build-debian.sh
+CMD ["/workspace/scripts/build-debian.sh"]
