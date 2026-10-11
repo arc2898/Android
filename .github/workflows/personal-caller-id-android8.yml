@@ -1,0 +1,44 @@
+name: Build Personal Caller ID Android APK
+
+on:
+  push:
+    branches:
+      - build/personal-caller-id-android8
+    paths:
+      - 'personal-caller-id-android8/**'
+      - '.github/workflows/personal-caller-id-android8.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build Android 8+ debug APK
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Gradle 8.9
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+
+      - name: Build debug APK
+        working-directory: personal-caller-id-android8
+        run: gradle assembleDebug
+
+      - name: Upload debug APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: personal-caller-id-debug-apk
+          path: personal-caller-id-android8/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
+          retention-days: 14
