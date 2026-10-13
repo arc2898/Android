@@ -1,9 +1,0 @@
-.gradle/
-build/
-local.properties
-*.iml
-.idea/
-__pycache__/
-.pytest_cache/
-*.db
-.env

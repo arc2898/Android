@@ -1,7 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="Dailer X logo">
-  <rect width="128" height="128" rx="24" fill="#201F1B"/>
-  <path d="M33 26h13v48c0 7 4 11 11 11 4 0 8-2 11-5l6 10c-5 5-11 8-20 8-14 0-21-9-21-23V26z" fill="#D3B165"/>
-  <path d="M78 34l9-5 12 21-9 5zM78 88l9 5 12-21-9-5z" fill="#D3B165"/>
-  <path d="M44 23h48v7H44z" fill="#D3B165"/>
-  <path d="M79 64h28" stroke="#F7F4EB" stroke-width="5" stroke-linecap="round"/>
-</svg>
